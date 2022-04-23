@@ -361,9 +361,22 @@ class MainWindow(QtWidgets.QWidget):
             fig = self.plots_layout["items"]["iradon_fig"]["object"]
             fig.setPixmap(frame)
 
-    @staticmethod
-    def showDicom() -> None:
-        DicomShowDialog().exec_()
+    def showDicom(self) -> None:
+        filename = QtWidgets.QFileDialog.getOpenFileName(self, "Otwórz DICOM", "./results/DICOM", "Plik DICOM (*.dcm)")[
+            0]
+        if filename == '':
+            self.close()
+            return False
+        else:
+            ds = pydicom.dcmread(filename)
+            ds.file_meta.TransferSyntaxUID = pydicom.uid.ImplicitVRLittleEndian
+            fig = self.plots_layout["items"]["img_fig"]["object"]
+            fig.setPixmap(Conversion().array2qpixmap(ds.pixel_array))
+
+            # save rgb image as greyscale
+            self.inputs["img"] = Conversion().rgb2greyscale(ds.pixel_array)
+            self.buttons_layout["items"]["run"]["object"].setEnabled(True)
+            self.plots_layout["items"]["animation_slider"]["object"].setDisabled(True)
 
     def saveDicom(self) -> None:
-        DicomSaveDialog(self.inputs["result"], self.ct_start_datetime).exec_()
+        DicomSaveDialog(self.inputs["img"], self.ct_start_datetime).exec_()
