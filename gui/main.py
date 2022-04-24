@@ -1,11 +1,12 @@
-import sys
-from typing import Any, List, Union, Tuple, Callable
-from ct import ComputerTomography
-from PySide2.QtGui import QPixmap
-from PySide2.QtCore import SIGNAL, QObject
-from threading import Thread
-from skimage import io
 from os import path
+from threading import Thread
+from typing import Any, List, Union, Tuple, Callable
+
+from PySide2.QtCore import SIGNAL, QObject
+from PySide2.QtGui import QPixmap
+from skimage import io
+
+from ct import ComputerTomography
 from gui.dicom import *
 
 
@@ -238,6 +239,8 @@ class MainWindow(QtWidgets.QWidget):
         """
         filename = QtWidgets.QFileDialog.getOpenFileName(self, "Otwórz plik", "./img",
                                                          "Otwórz plik (*.png *.jpg *.bmp)")
+
+        print(filename)
         if filename[0] == '':
             return
         else:

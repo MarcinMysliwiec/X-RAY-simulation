@@ -1,5 +1,6 @@
 from math import pi, radians
 from typing import Tuple, Callable
+import time
 
 import numpy as np
 import skimage
@@ -17,11 +18,11 @@ class ComputerTomography:
         """
         :param img: image to simulate radon transform
         :param alpha_angle: emiters and detectors_pos angle for next iteration in degrees
-        :param theta_angle: initial degree in degrees
+        :param theta_angle: angular diameter of detectors
         :param detectors_number: amount of detectors_pos
         """
-        if alpha_angle <= 0 or alpha_angle >= 180:
-            raise ArithmeticError("Rotate angle have to be in range (0, 180).")
+        if alpha_angle <= 0:
+            raise ArithmeticError("Rotate angle have to be greater than 0.")
 
         self.debug = debug
         self.fast_mode = fast_mode
@@ -47,9 +48,9 @@ class ComputerTomography:
 
         if self.debug:
             print('Inverse radon transform ended.')
-
-        skimage.io.imsave("./results/sinogram.jpg", sinogram)
-        skimage.io.imsave("./results/result.jpg", result)
+            # timestr = time.strftime("%Y%m%d-%H%M%S")
+            # skimage.io.imsave("./results/images/" + timestr + "-sinogram.jpg", sinogram)
+            # skimage.io.imsave("./results/images/" + timestr + "-result.jpg", result)
 
         return sinogram, result
 
@@ -59,7 +60,7 @@ class ComputerTomography:
         Construct sinogram from image.
         :param image: numpy image
         :param alpha_angle: rotate angle in degree per iteration
-        :param theta_angle: start angle in degree
+        :param theta_angle: angular diameter of detectors
         :param detectors_number: amount of detectors
         :param animate_func: function for save sinogram frames
         :return: sinogram
@@ -89,7 +90,7 @@ class ComputerTomography:
         Construct sinogram from image.
         :param image_shape: original image shape
         :param alpha_angle: angle in degree to rotate every iteration
-        :param theta_angle: theta angle in degree
+        :param theta_angle: angular diameter of detectors
         :param sinogram: sinogram of original image
         :param detectors_number: amount of detectors
         :param animate_func: function for save reconstructed image frames
