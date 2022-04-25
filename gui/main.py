@@ -64,7 +64,6 @@ class MainWindow(QtWidgets.QWidget):
                     "position": (2, 3),
                     "signal": "stateChanged(int)",
                     "slot": lambda x: self.setInputValue("fast_mode", False if not x else True)
-                    # in the linux, for Qt, 2 means True
                 }
             }
         }

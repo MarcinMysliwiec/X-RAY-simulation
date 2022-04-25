@@ -1,16 +1,11 @@
-import sys
-
-sys.path.append("")
-
-import numpy as np
 from datetime import datetime
 from typing import Dict
-from conversion import Conversion
-from PySide2.QtCore import Qt
+
 import PySide2.QtWidgets as QtWidgets
+import numpy as np
 import pydicom as pd
-import pydicom.uid
 import pydicom._storage_sopclass_uids
+import pydicom.uid
 
 
 class DicomSaveDialog(QtWidgets.QDialog):

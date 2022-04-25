@@ -1,9 +1,7 @@
 from math import pi, radians
 from typing import Tuple, Callable
-import time
 
 import numpy as np
-import skimage
 
 from .EmitterSimulation import calc_alpha_angles, simple_resenham_algorithm
 
