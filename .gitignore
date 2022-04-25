@@ -1,2 +1,9 @@
 results/images/*/*.jpg
+results/images/*/*.png
+results/images/*/*.xcf
+
+results/images/*/*/*.jpg
+results/images/*/*/*.png
+results/images/*/*/*.xcf
+
 results/DICOM/*.dcm

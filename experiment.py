@@ -1,6 +1,5 @@
 import glob
 import os
-import shutil
 import time
 from os import path
 
@@ -29,9 +28,9 @@ def generate_ct(
 
     sinogram, result = ct.run()
     timestr = time.strftime("%Y%m%d-%H%M%S")
-
-    skimage.io.imsave(dir + "/sinogram-" + sub_name + "-" + timestr + ".jpg", sinogram)
-    skimage.io.imsave(dir + "/result-" + sub_name + "-" + timestr + ".jpg", result)
+    sub_name = str(sub_name)
+    skimage.io.imsave(dir + "/sinogram-" + sub_name + "-" + ".jpg", sinogram)
+    skimage.io.imsave(dir + "/result-" + sub_name + "-" + ".jpg", result)
 
 
 def generate_gif(sub_folder):
@@ -49,7 +48,7 @@ def generate_gif(sub_folder):
 if __name__ == '__main__':
     debug = True
     fastMode = True
-    filename = './img/Kropka.jpg'
+    filename = './img/CT_ScoutView.jpg'
 
 
     def debug_log(*args):
@@ -58,8 +57,8 @@ if __name__ == '__main__':
                 print(arg)
 
 
-    if os.path.exists(IMG_DIR):
-        shutil.rmtree(IMG_DIR)
+    # if os.path.exists(IMG_DIR):
+    #     shutil.rmtree(IMG_DIR)
 
     detectors_default = 180
     detectors_start = 90
@@ -88,7 +87,7 @@ if __name__ == '__main__':
     debug_log("List of detectors:", list_of_detectors)
     for i, detectors_amount in enumerate(list_of_detectors):
         debug_log("\n", i, detectors_amount)
-        generate_ct('detectors',detectors_amount, debug, fastMode, img,
+        generate_ct('detectors', detectors_amount, debug, fastMode, img,
                     alpha_angle_default, theta_angle_default,
                     detectors_amount)
 
