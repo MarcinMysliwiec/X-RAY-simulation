@@ -113,7 +113,7 @@ class MainWindow(QtWidgets.QWidget):
                     "slot": lambda x: self.set_input_value("alpha_angle", x)
                 },
                 "theta_label": {
-                    "object": QtWidgets.QLabel("Kąt początkowy"),
+                    "object": QtWidgets.QLabel("Rozpiętość kątowa"),
                     "position": (3, 1)
                 },
                 "theta_angle": {

@@ -118,7 +118,6 @@ class ComputerTomography:
 
     def save_radon_frame(self, sinogram: np.ndarray) -> None:
         sinogram = np.array(sinogram, copy=True)
-        # sinogram *= 255
         self.sinogram_plots.append(sinogram)
 
     def save_iradon_frame(self, img: np.ndarray) -> None:
