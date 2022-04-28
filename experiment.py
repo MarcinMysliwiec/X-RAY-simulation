@@ -7,7 +7,7 @@ import skimage
 from PIL import Image
 from skimage import io
 
-from conversion import Conversion
+from helpers import Helpers
 from ct import ComputerTomography
 
 IMG_DIR = "./results/images/"
@@ -81,7 +81,7 @@ if __name__ == '__main__':
                             range(int(theta_angle_stop / theta_angle_step))]
 
     image = io.imread(path.expanduser(filename))
-    img = Conversion().rgb2greyscale(image)
+    img = Helpers().rgb2greyscale(image)
 
     debug_log("=== START EXPERIMENT WITH DIFFERENT DETECTORS ===")
     debug_log("List of detectors:", list_of_detectors)

@@ -4,8 +4,6 @@ from typing import Dict
 import PySide2.QtWidgets as QtWidgets
 import numpy as np
 import pydicom as pd
-import pydicom._storage_sopclass_uids
-import pydicom.uid
 
 
 class DicomSaveDialog(QtWidgets.QDialog):
@@ -105,7 +103,7 @@ class DicomSaveDialog(QtWidgets.QDialog):
                 meta = pd.Dataset()
 
                 # CT Image Storage
-                meta.MediaStorageSOPClassUID = pydicom._storage_sopclass_uids.CTImageStorage
+                meta.MediaStorageSOPClassUID = pd._storage_sopclass_uids.CTImageStorage
                 meta.MediaStorageSOPInstanceUID = pd.uid.generate_uid()
                 meta.TransferSyntaxUID = pd.uid.ExplicitVRLittleEndian
 
@@ -116,7 +114,7 @@ class DicomSaveDialog(QtWidgets.QDialog):
                 ds.is_implicit_VR = False
 
                 # CT Image Storage
-                ds.SOPClassUID = pydicom._storage_sopclass_uids.CTImageStorage
+                ds.SOPClassUID = pd._storage_sopclass_uids.CTImageStorage
                 ds.SOPInstanceUID = pd.uid.generate_uid()
 
                 ds.ContentDate = f"{self.date_time.year:04}{self.date_time.month:02}{self.date_time.day:02}"
@@ -128,9 +126,9 @@ class DicomSaveDialog(QtWidgets.QDialog):
                 ds.ImageComments = self.input_data["ImageComments"]
 
                 ds.Modality = "CT"
-                ds.SeriesInstanceUID = pydicom.uid.generate_uid()
-                ds.StudyInstanceUID = pydicom.uid.generate_uid()
-                ds.FrameOfReferenceUID = pydicom.uid.generate_uid()
+                ds.SeriesInstanceUID = pd.uid.generate_uid()
+                ds.StudyInstanceUID = pd.uid.generate_uid()
+                ds.FrameOfReferenceUID = pd.uid.generate_uid()
 
                 ds.BitsStored = 8
                 ds.BitsAllocated = 8
@@ -147,7 +145,7 @@ class DicomSaveDialog(QtWidgets.QDialog):
                 ds.PhotometricInterpretation = "MONOCHROME2"
                 ds.PixelRepresentation = 0
 
-                pydicom.dataset.validate_file_meta(ds.file_meta, enforce_standard=True)
+                pd.dataset.validate_file_meta(ds.file_meta, enforce_standard=True)
 
                 ds.PixelData = self.img.astype(np.uint8).tobytes()
 

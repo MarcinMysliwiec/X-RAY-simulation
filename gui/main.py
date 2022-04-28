@@ -2,10 +2,11 @@ from os import path
 from threading import Thread
 from typing import Any, List, Union, Tuple, Callable
 
-from PySide2.QtCore import SIGNAL, QObject
+from PySide2.QtCore import SIGNAL, QObject,Qt
 from PySide2.QtGui import QPixmap
 from skimage import io
 
+from helpers import Helpers
 from ct import ComputerTomography
 from gui.dicom import *
 
@@ -13,7 +14,7 @@ from gui.dicom import *
 class MainWindow(QtWidgets.QWidget):
     def __init__(self):
         QtWidgets.QWidget.__init__(self)
-        self.resize(1500, 800)
+        self.resize(1200, 800)
         self.ct_start_datetime: Union[None or datetime] = None
         self.debug = True
 
@@ -49,22 +50,6 @@ class MainWindow(QtWidgets.QWidget):
                     "object": QtWidgets.QLabel(self),
                     "position": (1, 3),
                 },
-                "animation_slider": {
-                    "object": QtWidgets.QSlider(Qt.Horizontal),
-                    "position": (2, 1),
-                    "signal": "valueChanged(int)",
-                    "slot": lambda x: self.setInputValue("animation_img_actual_frame", x / 100 if x < 99 else 1)
-                                      or self.setInputValue("animation_sinogram_actual_frame", x / 100 if x < 99 else 1)
-                                      or self.setInputValue("animation_result_actual_frame", x / 100 if x < 99 else 1)
-                                      or self.changeFrame("radon_fig")
-                                      or self.changeFrame("iradon_fig")
-                },
-                "fast_mode": {
-                    "object": QtWidgets.QCheckBox("Tryb szybki"),
-                    "position": (2, 3),
-                    "signal": "stateChanged(int)",
-                    "slot": lambda x: self.setInputValue("fast_mode", False if not x else True)
-                }
             }
         }
         self.buttons_layout = {
@@ -99,33 +84,50 @@ class MainWindow(QtWidgets.QWidget):
         self.inputs_layout = {
             "object": QtWidgets.QGridLayout(),
             "items": {
+                "animation_slider": {
+                    "object": QtWidgets.QSlider(Qt.Horizontal),
+                    "position": (1,1),
+                    "signal": "valueChanged(int)",
+                    "slot": lambda x: self.setInputValue("animation_img_actual_frame", x / 100 if x < 99 else 1)
+                                      or self.setInputValue("animation_sinogram_actual_frame", x / 100 if x < 99 else 1)
+                                      or self.setInputValue("animation_result_actual_frame", x / 100 if x < 99 else 1)
+                                      or self.changeFrame("radon_fig")
+                                      or self.changeFrame("iradon_fig")
+                },
+                "fast_mode": {
+                    "object": QtWidgets.QCheckBox("Tryb szybki"),
+                    "position": (1,2),
+                    "signal": "stateChanged(int)",
+                    "slot": lambda x: self.setInputValue("fast_mode", False if not x else True)
+                },
+
                 "alpha_angle_label": {
                     "object": QtWidgets.QLabel("Kąt obrotu"),
-                    "position": (1, 1)
+                    "position": (2, 1)
                 },
                 "alpha_angle": {
                     "object": QtWidgets.QSpinBox(),
-                    "position": (1, 2),
+                    "position": (2, 2),
                     "signal": "valueChanged(int)",
                     "slot": lambda x: self.setInputValue("alpha_angle", x)
                 },
                 "theta_label": {
                     "object": QtWidgets.QLabel("Kąt początkowy"),
-                    "position": (2, 1)
+                    "position": (3, 1)
                 },
                 "theta_angle": {
                     "object": QtWidgets.QSpinBox(),
-                    "position": (2, 2),
+                    "position": (3, 2),
                     "signal": "valueChanged(int)",
                     "slot": lambda x: self.setInputValue("theta_angle", x)
                 },
                 "detectors_num_label": {
                     "object": QtWidgets.QLabel("Ilość czujników"),
-                    "position": (3, 1)
+                    "position": (4, 1)
                 },
                 "detectors_num": {
                     "object": QtWidgets.QSpinBox(),
-                    "position": (3, 2),
+                    "position": (4, 2),
                     "signal": "valueChanged(int)",
                     "slot": lambda x: self.setInputValue("detectors_amount", x)
                 },
@@ -148,14 +150,10 @@ class MainWindow(QtWidgets.QWidget):
                             "reference": self.inputs_layout,
                             "position": (1, 1)
                         },
-                        "empty": {
-                            "object": QtWidgets.QWidget(),
-                            "position": (1, 2)
-                        },
                         "right": {
                             "reference": self.buttons_layout,
-                            "position": (1, 3)
-                        }
+                            "position": (1, 2)
+                        },
                     }
                 }
             }
@@ -180,9 +178,9 @@ class MainWindow(QtWidgets.QWidget):
             QtWidgets.QFrame.Panel | QtWidgets.QFrame.Plain)
         self.plots_layout["items"]["iradon_fig"]["object"].setLineWidth(1)
 
-        self.plots_layout["items"]["animation_slider"]["object"].setSizePolicy(QtWidgets.QSizePolicy.Preferred,
+        self.inputs_layout["items"]["animation_slider"]["object"].setSizePolicy(QtWidgets.QSizePolicy.Preferred,
                                                                                QtWidgets.QSizePolicy.Preferred)
-        self.plots_layout["items"]["animation_slider"]["object"].setDisabled(True)
+        self.inputs_layout["items"]["animation_slider"]["object"].setDisabled(True)
 
         self.inputs_layout["items"]["theta_angle"]["object"].setMinimum(0)
         self.inputs_layout["items"]["theta_angle"]["object"].setMaximum(360)
@@ -246,13 +244,13 @@ class MainWindow(QtWidgets.QWidget):
             # RGB image
             img = io.imread(path.expanduser(filename[0]))
             fig = self.plots_layout["items"]["img_fig"]["object"]
-            fig.setPixmap(Conversion().array2qpixmap(img))
+            fig.setPixmap(Helpers().array2qpixmap(img))
 
             # save rgb image as greyscale
-            self.inputs["img"] = Conversion().rgb2greyscale(img)
+            self.inputs["img"] = Helpers().rgb2greyscale(img)
             self.buttons_layout["items"]["run"]["object"].setEnabled(True)
 
-            self.plots_layout["items"]["animation_slider"]["object"].setDisabled(True)
+            self.inputs_layout["items"]["animation_slider"]["object"].setDisabled(True)
 
     def startComputerTomography(self) -> None:
         runStatus = self.buttons_layout["items"]["run"]["object"].isEnabled()
@@ -287,11 +285,11 @@ class MainWindow(QtWidgets.QWidget):
                     self.inputs["animation_result_frames"].append(self.inputs["result"])
                     self.preprocessFrames(self.inputs["animation_sinogram_frames"])
                     self.preprocessFrames(self.inputs["animation_result_frames"])
-                    self.plots_layout["items"]["animation_slider"]["object"].setEnabled(True)
-                    self.plots_layout["items"]["animation_slider"]["object"].setValue(100)
+                    self.inputs_layout["items"]["animation_slider"]["object"].setEnabled(True)
+                    self.inputs_layout["items"]["animation_slider"]["object"].setValue(100)
 
                 else:
-                    self.plots_layout["items"]["animation_slider"]["object"].setDisabled(True)
+                    self.inputs_layout["items"]["animation_slider"]["object"].setDisabled(True)
 
                 self.plots_layout["items"]["radon_fig"]["object"].setPixmap(
                     self.preprocessFrame(self.inputs["sinogram"]))
@@ -315,7 +313,7 @@ class MainWindow(QtWidgets.QWidget):
         :param frames: numpy greyscale ndarray list
         :return: None
         """
-        conv = Conversion(frames[0].shape)
+        conv = Helpers(frames[0].shape)
         for index, img in enumerate(frames):
             frames[index] = conv.array2qpixmap(conv.greyscale2rgb(img))
 
@@ -326,7 +324,7 @@ class MainWindow(QtWidgets.QWidget):
         :param frame: numpy greyscale ndarray
         :return: QPixmap
         """
-        conv = Conversion()
+        conv = Helpers()
         return conv.array2qpixmap(conv.greyscale2rgb(frame))
 
     @staticmethod
@@ -370,15 +368,15 @@ class MainWindow(QtWidgets.QWidget):
             self.close()
             return False
         else:
-            ds = pydicom.dcmread(filename)
-            ds.file_meta.TransferSyntaxUID = pydicom.uid.ImplicitVRLittleEndian
+            ds = pd.dcmread(filename)
+            ds.file_meta.TransferSyntaxUID = pd.uid.ImplicitVRLittleEndian
             fig = self.plots_layout["items"]["img_fig"]["object"]
-            fig.setPixmap(Conversion().array2qpixmap(ds.pixel_array))
+            fig.setPixmap(Helpers().array2qpixmap(ds.pixel_array))
 
             # save rgb image as greyscale
-            self.inputs["img"] = Conversion().rgb2greyscale(ds.pixel_array)
+            self.inputs["img"] = Helpers().rgb2greyscale(ds.pixel_array)
             self.buttons_layout["items"]["run"]["object"].setEnabled(True)
-            self.plots_layout["items"]["animation_slider"]["object"].setDisabled(True)
+            self.inputs_layout["items"]["animation_slider"]["object"].setDisabled(True)
 
     def saveDicom(self) -> None:
         DicomSaveDialog(self.inputs["img"], self.ct_start_datetime).exec_()

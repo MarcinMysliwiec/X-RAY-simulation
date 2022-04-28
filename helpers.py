@@ -3,10 +3,11 @@ import numpy as np
 from PySide2.QtGui import QPixmap, QImage, QColor
 
 
-class Conversion:
+class Helpers:
     """
     Helper class for numpy array conversion.
     """
+
     def __init__(self, shape: Tuple[int, int] = None):
         if shape is not None:
             self.qimage = QImage(shape[1], shape[0], QImage.Format_RGB16)
