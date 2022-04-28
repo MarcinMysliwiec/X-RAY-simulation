@@ -13,7 +13,7 @@ class DicomSaveDialog(QtWidgets.QDialog):
     Class for save patient informations to DICOM file.
     """
 
-    def __init__(self, img: np.ndarray, date_time: datetime):
+    def __init__(self, img: np.ndarray, date_time: datetime, name_input: str, id_input: str, comments_input: str):
         """
         :param img: image to save
         :param date_time: ct operation start datetime
@@ -23,72 +23,33 @@ class DicomSaveDialog(QtWidgets.QDialog):
         self.img = img
         self.date_time = date_time
 
-        self.input_data: Dict[str, None or str] = {
-            'PatientID': None,
-            'PatientName': None,
-            'ImageComments': None
-        }
+        self.name_input = name_input
+        self.id_input = id_input
+        self.comments_input = comments_input
 
-        self.name_input = None
-        self.id_input = None
-        self.comments_input = None
-
-        self.create_layout()
-
-    def create_layout(self) -> None:
-        self.name_input = QtWidgets.QLineEdit()
-        self.id_input = QtWidgets.QLineEdit()
-        self.comments_input = QtWidgets.QPlainTextEdit()
-
-        self.comments_input.setLineWrapMode(QtWidgets.QPlainTextEdit.WidgetWidth)
-
-        cancel = QtWidgets.QPushButton('Anuluj')
-        save = QtWidgets.QPushButton('Zapisz')
-
-        cancel.clicked.connect(self.close)
-        save.clicked.connect(self.save)
-
-        grid = QtWidgets.QGridLayout()
-        grid.addWidget(cancel, 1, 1)
-        grid.addWidget(save, 1, 2)
-
-        form = QtWidgets.QFormLayout()
-        form.addRow(QtWidgets.QLabel('ID pacjenta'), self.id_input)
-        form.addRow(QtWidgets.QLabel('Imie'), self.name_input)
-        form.addRow(QtWidgets.QLabel('Komentarze'), self.comments_input)
-        form.addRow(grid)
-        self.setLayout(form)
+        print("contruct", self.name_input, self.id_input, self.comments_input)
 
     def validate_input(self) -> bool:
         mb = QtWidgets.QErrorMessage()
         mb.setModal(True)
-        if self.id_input.text() == '':
+        if self.id_input == '':
             mb.showMessage('ID pacjenta nie może być puste!')
             mb.exec_()
             return False
-        elif self.name_input.text() == '':
+        elif self.name_input == '':
             mb.showMessage('Imie pacjenta nie może być puste.')
             mb.exec_()
             return False
 
         return True
 
-    def parse_input(self) -> bool:
-        if not self.validate_input():
-            return False
-        else:
-            self.input_data["PatientID"] = self.id_input.text()
-            self.input_data["PatientName"] = self.name_input.text()
-            self.input_data["ImageComments"] = self.comments_input.toPlainText()
-
-            return True
 
     def save(self) -> None:
         """
         Save input data into DICOM file.
         :return: None
         """
-        if not self.parse_input():
+        if not self.validate_input():
             return
         else:
             filename = QtWidgets.QFileDialog.getSaveFileName(self, "Zapisz DICOM", "./results/DICOM", "*.dcm")[0]
@@ -115,9 +76,9 @@ class DicomSaveDialog(QtWidgets.QDialog):
                 ds.ContentDate = f"{self.date_time.year:04}{self.date_time.month:02}{self.date_time.day:02}"
                 ds.ContentTime = f"{self.date_time.hour:02}{self.date_time.minute:02}{self.date_time.second:02}"
 
-                ds.PatientName = self.input_data["PatientName"]
-                ds.PatientID = self.input_data["PatientID"]
-                ds.ImageComments = self.input_data["ImageComments"]
+                ds.PatientID = self.id_input
+                ds.PatientName = self.name_input
+                ds.ImageComments = self.comments_input
 
                 ds.Modality = "CT"
                 ds.SeriesInstanceUID = pd.uid.generate_uid()

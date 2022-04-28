@@ -163,7 +163,6 @@ class MainWindow(QtWidgets.QWidget):
                     "object": QtWidgets.QLineEdit(),
                     "position": (3, 2),
                 },
-
                 "ct_date_time_label": {
                     "object": QtWidgets.QLabel("Data Badania"),
                     "position": (4, 1)
@@ -287,7 +286,6 @@ class MainWindow(QtWidgets.QWidget):
         filename = QtWidgets.QFileDialog.getOpenFileName(self, "Otwórz plik", "./img",
                                                          "Otwórz plik (*.png *.jpg *.bmp)")
 
-        print(filename)
         if filename[0] == '':
             return
         else:
@@ -352,6 +350,12 @@ class MainWindow(QtWidgets.QWidget):
                 self.buttons_layout["items"]["run"]["object"].setEnabled(runStatus)
                 self.buttons_layout["items"]["load"]["object"].setEnabled(loadStauts)
                 self.buttons_layout["items"]["save_dicom"]["object"].setEnabled(True)
+
+                self.dicom_data["items"]["id_value"]["object"].setDisabled(False)
+                self.dicom_data["items"]["name_value"]["object"].setDisabled(False)
+                self.dicom_data["items"]["comment_value"]["object"].setDisabled(False)
+                self.dicom_data["items"]["ct_date_time_value"]["object"].setText(
+                    self.ct_start_datetime.strftime("%Y-%m-%d %H:%M:%S"))
 
         thread = Thread(target=task)
         thread.start()
@@ -439,4 +443,9 @@ class MainWindow(QtWidgets.QWidget):
                     f"{year}/{month}/{day} {hour}:{minute}:{second}")
 
     def save_dicom(self) -> None:
-        DicomSaveDialog(self.inputs["img"], self.ct_start_datetime).exec_()
+        id_value = self.dicom_data["items"]["id_value"]["object"].text()
+        name_value = self.dicom_data["items"]["name_value"]["object"].text()
+        comment_value = self.dicom_data["items"]["comment_value"]["object"].text()
+
+        DicomSaveDialog(self.inputs["img"], self.ct_start_datetime, id_value, name_value,
+                        comment_value).save()
