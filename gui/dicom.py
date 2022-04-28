@@ -4,6 +4,8 @@ from typing import Dict
 import PySide2.QtWidgets as QtWidgets
 import numpy as np
 import pydicom as pd
+import pydicom.uid
+import pydicom._storage_sopclass_uids
 
 
 class DicomSaveDialog(QtWidgets.QDialog):
@@ -24,26 +26,21 @@ class DicomSaveDialog(QtWidgets.QDialog):
         self.input_data: Dict[str, None or str] = {
             'PatientID': None,
             'PatientName': None,
-            'PatientSex': None,
             'ImageComments': None
         }
 
         self.name_input = None
         self.id_input = None
-        self.sex_input = None
         self.comments_input = None
 
-        self.createLayout()
+        self.create_layout()
 
-    def createLayout(self) -> None:
+    def create_layout(self) -> None:
         self.name_input = QtWidgets.QLineEdit()
         self.id_input = QtWidgets.QLineEdit()
-        self.sex_input = QtWidgets.QComboBox()
         self.comments_input = QtWidgets.QPlainTextEdit()
 
         self.comments_input.setLineWrapMode(QtWidgets.QPlainTextEdit.WidgetWidth)
-        self.sex_input.addItem('Mezczyzna')
-        self.sex_input.addItem('Kobieta')
 
         cancel = QtWidgets.QPushButton('Anuluj')
         save = QtWidgets.QPushButton('Zapisz')
@@ -58,12 +55,11 @@ class DicomSaveDialog(QtWidgets.QDialog):
         form = QtWidgets.QFormLayout()
         form.addRow(QtWidgets.QLabel('ID pacjenta'), self.id_input)
         form.addRow(QtWidgets.QLabel('Imie'), self.name_input)
-        form.addRow(QtWidgets.QLabel('Płec'), self.sex_input)
         form.addRow(QtWidgets.QLabel('Komentarze'), self.comments_input)
         form.addRow(grid)
         self.setLayout(form)
 
-    def validateInput(self) -> bool:
+    def validate_input(self) -> bool:
         mb = QtWidgets.QErrorMessage()
         mb.setModal(True)
         if self.id_input.text() == '':
@@ -77,13 +73,12 @@ class DicomSaveDialog(QtWidgets.QDialog):
 
         return True
 
-    def parseInput(self) -> bool:
-        if not self.validateInput():
+    def parse_input(self) -> bool:
+        if not self.validate_input():
             return False
         else:
             self.input_data["PatientID"] = self.id_input.text()
             self.input_data["PatientName"] = self.name_input.text()
-            self.input_data["PatientSex"] = 'M' if self.sex_input.currentText() == 'Male' else 'F'
             self.input_data["ImageComments"] = self.comments_input.toPlainText()
 
             return True
@@ -93,7 +88,7 @@ class DicomSaveDialog(QtWidgets.QDialog):
         Save input data into DICOM file.
         :return: None
         """
-        if not self.parseInput():
+        if not self.parse_input():
             return
         else:
             filename = QtWidgets.QFileDialog.getSaveFileName(self, "Zapisz DICOM", "./results/DICOM", "*.dcm")[0]
@@ -122,7 +117,6 @@ class DicomSaveDialog(QtWidgets.QDialog):
 
                 ds.PatientName = self.input_data["PatientName"]
                 ds.PatientID = self.input_data["PatientID"]
-                ds.PatientSex = self.input_data["PatientSex"]
                 ds.ImageComments = self.input_data["ImageComments"]
 
                 ds.Modality = "CT"
@@ -151,4 +145,3 @@ class DicomSaveDialog(QtWidgets.QDialog):
 
                 ds.save_as(f"{filename}", write_like_original=False)
                 self.close()
-

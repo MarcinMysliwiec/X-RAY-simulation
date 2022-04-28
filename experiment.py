@@ -1,5 +1,6 @@
 import glob
 import os
+import shutil
 import time
 from os import path
 
@@ -27,7 +28,7 @@ def generate_ct(
         os.makedirs(dir)
 
     sinogram, result = ct.run()
-    timestr = time.strftime("%Y%m%d-%H%M%S")
+    # timestr = time.strftime("%Y%m%d-%H%M%S")
     sub_name = str(sub_name)
     skimage.io.imsave(dir + "/sinogram-" + sub_name + "-" + ".jpg", sinogram)
     skimage.io.imsave(dir + "/result-" + sub_name + "-" + ".jpg", result)
@@ -57,8 +58,8 @@ if __name__ == '__main__':
                 print(arg)
 
 
-    # if os.path.exists(IMG_DIR):
-    #     shutil.rmtree(IMG_DIR)
+    if os.path.exists(IMG_DIR):
+        shutil.rmtree(IMG_DIR)
 
     detectors_default = 180
     detectors_start = 90
