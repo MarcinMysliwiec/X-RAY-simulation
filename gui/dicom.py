@@ -1,11 +1,10 @@
 from datetime import datetime
-from typing import Dict
 
 import PySide2.QtWidgets as QtWidgets
 import numpy as np
 import pydicom as pd
-import pydicom.uid
 import pydicom._storage_sopclass_uids
+import pydicom.uid
 
 
 class DicomSaveDialog(QtWidgets.QDialog):
@@ -42,7 +41,6 @@ class DicomSaveDialog(QtWidgets.QDialog):
             return False
 
         return True
-
 
     def save(self) -> None:
         """

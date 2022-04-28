@@ -2,14 +2,13 @@ from os import path
 from threading import Thread
 from typing import Any, List, Union, Tuple, Callable
 
-from PySide2 import QtGui
 from PySide2.QtCore import SIGNAL, QObject, Qt
 from PySide2.QtGui import QPixmap
 from skimage import io
 
-from helpers import Helpers
 from ct import ComputerTomography
 from gui.dicom import *
+from helpers import Helpers
 
 
 class MainWindow(QtWidgets.QWidget):
@@ -436,11 +435,13 @@ class MainWindow(QtWidgets.QWidget):
             self.dicom_data["items"]["name_value"]["object"].setText(str(ds.PatientName))
             self.dicom_data["items"]["comment_value"]["object"].setText(str(ds.ImageComments))
 
-            if ds.ContentDate:
+            if hasattr(ds, 'ContentDate'):
                 year, month, day = ds.ContentDate[:4], ds.ContentDate[4:6], ds.ContentDate[6:8]
                 hour, minute, second = ds.ContentTime[:2], ds.ContentTime[2:4], ds.ContentTime[4:6]
                 self.dicom_data["items"]["ct_date_time_value"]["object"].setText(
                     f"{year}/{month}/{day} {hour}:{minute}:{second}")
+            else:
+                self.dicom_data["items"]["ct_date_time_value"]["object"].setText("DICOM nie zawiera daty")
 
     def save_dicom(self) -> None:
         id_value = self.dicom_data["items"]["id_value"]["object"].text()
