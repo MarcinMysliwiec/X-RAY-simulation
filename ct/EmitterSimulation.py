@@ -30,7 +30,7 @@ def coords_formula_to_image(coords, image_size):
     return r, c
 
 
-def simple_resenham_algorithm(image, theta_angle, detectors_number, alpha_angle):
+def simple_bresenham_algorithm(image, theta_angle, detectors_number, alpha_angle):
     radius = calc_radius(image)
     emitter_coords = find_emitter_coords(radius, alpha_angle, theta_angle, detectors_number)
     detector_coords = find_detector_coords(radius, alpha_angle, theta_angle, detectors_number)

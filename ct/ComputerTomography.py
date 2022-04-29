@@ -3,7 +3,7 @@ from typing import Tuple, Callable
 
 import numpy as np
 
-from .EmitterSimulation import calc_alpha_angles, simple_resenham_algorithm
+from .EmitterSimulation import calc_alpha_angles, simple_bresenham_algorithm
 
 
 class ComputerTomography:
@@ -70,7 +70,7 @@ class ComputerTomography:
         sinogram = np.zeros((len(list_of_alpha_angles), detectors_number), dtype=np.float16)
 
         for i, alpha in enumerate(list_of_alpha_angles):
-            for j, line in enumerate(simple_resenham_algorithm(image, theta_angle, detectors_number, alpha)):
+            for j, line in enumerate(simple_bresenham_algorithm(image, theta_angle, detectors_number, alpha)):
                 value = np.average(image[line])
                 sinogram[i, j] = value
             if not self.fast_mode:
@@ -100,7 +100,7 @@ class ComputerTomography:
         image = np.zeros(image_shape, dtype=np.float16)
 
         for i, alpha in enumerate(list_of_alpha_angles):
-            for j, line in enumerate(simple_resenham_algorithm(image, theta_angle, detectors_number, alpha)):
+            for j, line in enumerate(simple_bresenham_algorithm(image, theta_angle, detectors_number, alpha)):
                 image[line] += sinogram[i, j]
             if not self.fast_mode:
                 animate_func(image)
